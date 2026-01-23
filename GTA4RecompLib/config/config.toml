@@ -1,0 +1,41 @@
+# Config TOML file for GTA4Recomp
+# GTA4 Xbox 360 (USA) was used
+
+[main]
+file_path = "../private/default.xex"
+out_directory_path = "../ppc"
+switch_table_file_path = "GTA4_switch_tables.toml
+
+# Optimisations, everything disabled for now
+skip_lr = false
+skip_msr = false
+ctr_as_local = false
+xer_as_local = false
+reserved_as_local = false
+cr_as_local = false
+non_argument_as_local = false
+non_volatile_as_local = false
+
+# Register Restore & Save Functions
+restgprlr_14_address = 0x8298EB30
+savegprlr_14_address = 0x8298EAE0
+restfpr_14_address = 0x8299015C
+savefpr_14_address = 0x82990110
+restvmx_14_address = 0x82990598
+savevmx_14_address = 0x82990300
+restvmx_64_address = 0x8299062C
+savevmx_64_address = 0x82990394
+
+# Explicit Functions Boundaries
+functions = [
+    { address = 0x82990020, size = 0x50 },
+    { address = 0x82990830, size = 0x11C },
+    { address = 0x8299094C, size = 0x37C },
+]
+
+# Invalid Instruction Skips
+invalid_instructions = [
+    { data = 0x00000000, size = 4 }, # Padding
+]
+
+# need to add mid-asm hooks later?
