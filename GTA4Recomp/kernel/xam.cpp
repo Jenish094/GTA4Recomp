@@ -1,7 +1,10 @@
+#include <cstdio>
+#include <fmt/base.h>
 #include <stdafx.h>
 #include "xam.h"
 #include "xdm.h"
 #include <hid/hid.h>
+#include <hid/mouse_camera.h>
 #include <ui/game_window.h>
 #include <cpu/guest_thread.h>
 #include <ranges>
@@ -9,6 +12,8 @@
 #include "xxHashMap.h"
 #include <user/paths.h>
 #include <SDL.h>
+
+#define SAVE_SYSTEM_DEBUG_LOGGING 1
 
 struct XamListener : KernelObject
 {
@@ -206,9 +211,7 @@ uint32_t XamShowMessageBoxUI(uint32_t dwUserIndex, be<uint16_t>* wszTitle, be<ui
 #if _DEBUG
     assert("XamShowMessageBoxUI encountered!" && false);
 #elif _WIN32
-    // This code is Win32-only as it'll most likely crash, misbehave or
-    // cause corruption due to using a different type of memory than what
-    // wchar_t is on Linux. Windows uses 2 bytes while Linux uses 4 bytes.
+
     std::vector<std::wstring> texts{};
 
     texts.emplace_back(reinterpret_cast<wchar_t*>(wszTitle));
@@ -223,14 +226,6 @@ uint32_t XamShowMessageBoxUI(uint32_t dwUserIndex, be<uint16_t>* wszTitle, be<ui
             ByteSwapInplace(text[i]);
     }
 
-    wprintf(L"[XamShowMessageBoxUI] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-    wprintf(L"[XamShowMessageBoxUI] If you are encountering this message and the game has ceased functioning,\n");
-    wprintf(L"[XamShowMessageBoxUI] please create an issue at https://github.com/hedge-dev/UnleashedRecomp/issues.\n");
-    wprintf(L"[XamShowMessageBoxUI] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-    wprintf(L"[XamShowMessageBoxUI] %ls\n", texts[0].c_str());
-    wprintf(L"[XamShowMessageBoxUI] %ls\n", texts[1].c_str());
-    wprintf(L"[XamShowMessageBoxUI] ");
-
     for (size_t i = 0; i < cButtons; i++)
     {
         wprintf(L"%ls", texts[2 + i].c_str());
@@ -238,10 +233,6 @@ uint32_t XamShowMessageBoxUI(uint32_t dwUserIndex, be<uint16_t>* wszTitle, be<ui
         if (i != cButtons - 1)
             wprintf(L" | ");
     }
-
-    wprintf(L"\n");
-    wprintf(L"[XamShowMessageBoxUI] Defaulted to button: %d\n", pResult->get());
-    wprintf(L"[XamShowMessageBoxUI] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 #endif
 
     if (pOverlapped)
@@ -277,6 +268,29 @@ uint32_t XamContentCreateEnumerator(uint32_t dwUserIndex, uint32_t DeviceID, uin
     return 0;
 }
 
+// stub for achievement enum, dont know if it works or not just need a working build first
+uint32_t XamUserCreateAchievementEnumerator(uint32_t titleId, uint32_t userIndex, uint32_t xuidCount,
+    void* pxuid, uint32_t dwStartingIndex, uint32_t cItem, be<uint32_t>* pcbBuffer, be<uint32_t>* phEnum)
+{
+    if (phEnum)
+        *phEnum = 0;
+    if (pcbBuffer)
+        *pcbBuffer = 0;
+    return ERROR_NO_MORE_FILES;
+}
+
+uint32_t XeKeysConsoleSignatureVerification(void* signature, uint32_t signatureSize, void* data, uint32_t dataSize)
+{
+    return 0;
+}
+
+uint32_t XamGetPrivateEnumStructureFromHandle(uint32_t hEnum, void** ppEnumData)
+{
+    if (ppEnumData)
+        *ppEnumData = nullptr;
+    return ERROR_INVALID_HANDLE;
+}
+
 uint32_t XamEnumerate(uint32_t hEnum, uint32_t dwFlags, void* pvBuffer, uint32_t cbBuffer, be<uint32_t>* pcItemsReturned, XXOVERLAPPED* pOverlapped)
 {
     auto* enumerator = GetKernelObject<XamEnumeratorBase>(hEnum);
@@ -295,12 +309,21 @@ uint32_t XamContentCreateEx(uint32_t dwUserIndex, const char* szRootName, const 
     uint32_t dwContentFlags, be<uint32_t>* pdwDisposition, be<uint32_t>* pdwLicenseMask,
     uint32_t dwFileCacheSize, uint64_t uliContentSize, PXXOVERLAPPED pOverlapped)
 {
+#if SAVE_SYSTEM_DEBUG_LOGGING
+    printf("[XamContentCreateEx] Root: '%s', Content: '%s'\n", szRootName, pContentData->szFileName);
+    printf("[XamContentCreateEx] Type: %u, Flags: 0x%X, User: %u\n", 
+           pContentData->dwContentType, dwContentFlags, dwUserIndex);
+#endif
+    
     const auto& registry = gContentRegistry[pContentData->dwContentType - 1];
     const auto exists = registry.contains(StringHash(pContentData->szFileName));
     const auto mode = dwContentFlags & 0xF;
 
     if (mode == CREATE_ALWAYS)
     {
+#if SAVE_SYSTEM_DEBUG_LOGGING
+        printf("[XamContentCreateEx] Mode: CREATE_ALWAYS\n");
+#endif
         if (pdwDisposition)
             *pdwDisposition = XCONTENT_NEW;
 
@@ -311,6 +334,9 @@ uint32_t XamContentCreateEx(uint32_t dwUserIndex, const char* szRootName, const 
             if (pContentData->dwContentType == XCONTENTTYPE_SAVEDATA)
             {
                 rootPath = GetSavePath(true);
+#if SAVE_SYSTEM_DEBUG_LOGGING
+                printf("[XamContentCreateEx] Save data path: %s\n", rootPath.string().c_str());
+#endif
             }
             else if (pContentData->dwContentType == XCONTENTTYPE_DLC)
             {
@@ -326,19 +352,36 @@ uint32_t XamContentCreateEx(uint32_t dwUserIndex, const char* szRootName, const 
 
             std::error_code ec;
             std::filesystem::create_directory(rootPath, ec);
+            
+            if (ec)
+            {
+                printf("[XamContentCreateEx] ERROR: Failed to create directory: %s\n", ec.message().c_str());
+            }
 
             XamRootCreate(szRootName, root);
+#if SAVE_SYSTEM_DEBUG_LOGGING
+            printf("[XamContentCreateEx] Created new content, root mapped: %s -> %s\n", szRootName, root.c_str());
+#endif
         }
         else
         {
             XamRootCreate(szRootName, registry.find(StringHash(pContentData->szFileName))->second.szRoot);
+#if SAVE_SYSTEM_DEBUG_LOGGING
+            printf("[XamContentCreateEx] Content exists, using registered root\n");
+#endif
         }
 
+#if SAVE_SYSTEM_DEBUG_LOGGING
+        printf("[XamContentCreateEx] Result: SUCCESS\n");
+#endif
         return ERROR_SUCCESS;
     }
 
     if (mode == OPEN_EXISTING)
     {
+#if SAVE_SYSTEM_DEBUG_LOGGING
+        printf("[XamContentCreateEx] Mode: OPEN_EXISTING\n");
+#endif
         if (exists)
         {
             if (pdwDisposition)
@@ -346,6 +389,10 @@ uint32_t XamContentCreateEx(uint32_t dwUserIndex, const char* szRootName, const 
 
             XamRootCreate(szRootName, registry.find(StringHash(pContentData->szFileName))->second.szRoot);
 
+#if SAVE_SYSTEM_DEBUG_LOGGING
+            printf("[XamContentCreateEx] Content found and opened\n");
+            printf("[XamContentCreateEx] Result: SUCCESS\n");
+#endif
             return ERROR_SUCCESS;
         }
         else
@@ -353,16 +400,36 @@ uint32_t XamContentCreateEx(uint32_t dwUserIndex, const char* szRootName, const 
             if (pdwDisposition)
                 *pdwDisposition = XCONTENT_NEW;
 
+#if SAVE_SYSTEM_DEBUG_LOGGING
+            printf("[XamContentCreateEx] Content not found\n");
+            printf("[XamContentCreateEx] Result: ERROR_PATH_NOT_FOUND\n");
+#endif
             return ERROR_PATH_NOT_FOUND;
         }
     }
 
+#if SAVE_SYSTEM_DEBUG_LOGGING
+    printf("[XamContentCreateEx] Unknown mode: 0x%X\n", mode);
+    printf("[XamContentCreateEx] Result: ERROR_PATH_NOT_FOUND\n");
+#endif
     return ERROR_PATH_NOT_FOUND;
 }
 
 uint32_t XamContentClose(const char* szRootName, XXOVERLAPPED* pOverlapped)
 {
+#if SAVE_SYSTEM_DEBUG_LOGGING
+    printf("[XamContentClose] Closing root: '%s'\n", szRootName);
+#endif
+    
     gRootMap.erase(StringHash(szRootName));
+    
+    if (pOverlapped)
+    {
+        pOverlapped->dwCompletionContext = GuestThread::GetCurrentThreadId();
+        pOverlapped->Error = 0;
+        pOverlapped->Length = 0;
+    }
+    
     return 0;
 }
 
@@ -370,20 +437,30 @@ uint32_t XamContentGetDeviceData(uint32_t DeviceID, XDEVICE_DATA* pDeviceData)
 {
     pDeviceData->DeviceID = DeviceID;
     pDeviceData->DeviceType = XCONTENTDEVICETYPE_HDD;
-    pDeviceData->ulDeviceBytes = 0x10000000;
-    pDeviceData->ulDeviceFreeBytes = 0x10000000;
-    pDeviceData->wszName[0] = 'S';
-    pDeviceData->wszName[1] = 'o';
-    pDeviceData->wszName[2] = 'n';
-    pDeviceData->wszName[3] = 'i';
-    pDeviceData->wszName[4] = 'c';
-    pDeviceData->wszName[5] = '\0';
+    pDeviceData->ulDeviceBytes = 0x40000000;      // 1GB total
+    pDeviceData->ulDeviceFreeBytes = 0x40000000;
+    pDeviceData->wszName[0] = 'G';
+    pDeviceData->wszName[1] = 'T';
+    pDeviceData->wszName[2] = 'A';
+    pDeviceData->wszName[3] = '4';
+    pDeviceData->wszName[4] = '\0';
 
     return 0;
 }
 
+uint32_t XamContentGetDeviceState(uint32_t DeviceID, be<uint32_t>* pState)
+{
+    if (pState)
+        *pState = 1;
+    
+    return ERROR_SUCCESS;
+}
+
 uint32_t XamInputGetCapabilities(uint32_t unk, uint32_t userIndex, uint32_t flags, XAMINPUT_CAPABILITIES* caps)
 {
+    if (userIndex != 0)
+        return ERROR_NO_SUCH_USER;
+
     uint32_t result = hid::GetCapabilities(userIndex, caps);
 
     if (result == ERROR_SUCCESS)
@@ -403,15 +480,21 @@ uint32_t XamInputGetCapabilities(uint32_t unk, uint32_t userIndex, uint32_t flag
 
 uint32_t XamInputGetState(uint32_t userIndex, uint32_t flags, XAMINPUT_STATE* state)
 {
+    if (userIndex != 0)
+        return ERROR_NO_SUCH_USER;
+
     memset(state, 0, sizeof(*state));
 
     if (hid::IsInputAllowed())
         hid::GetState(userIndex, state);
 
     auto keyboardState = SDL_GetKeyboardState(NULL);
+    auto mouseState = SDL_GetMouseState(nullptr, nullptr);
 
+    // Keyboard to controller
     if (GameWindow::s_isFocused && !keyboardState[SDL_SCANCODE_LALT])
     {
+        // Left stick
         if (keyboardState[Config::Key_LeftStickUp])
             state->Gamepad.sThumbLY = 32767;
         if (keyboardState[Config::Key_LeftStickDown])
@@ -421,6 +504,7 @@ uint32_t XamInputGetState(uint32_t userIndex, uint32_t flags, XAMINPUT_STATE* st
         if (keyboardState[Config::Key_LeftStickRight])
             state->Gamepad.sThumbLX = 32767;
 
+        // Mouse to right stick
         if (keyboardState[Config::Key_RightStickUp])
             state->Gamepad.sThumbRY = 32767;
         if (keyboardState[Config::Key_RightStickDown])
@@ -430,11 +514,13 @@ uint32_t XamInputGetState(uint32_t userIndex, uint32_t flags, XAMINPUT_STATE* st
         if (keyboardState[Config::Key_RightStickRight])
             state->Gamepad.sThumbRX = 32767;
 
+        // Triggers to mouse
         if (keyboardState[Config::Key_LeftTrigger])
             state->Gamepad.bLeftTrigger = 0xFF;
         if (keyboardState[Config::Key_RightTrigger])
             state->Gamepad.bRightTrigger = 0xFF;
 
+        // DPAD
         if (keyboardState[Config::Key_DPadUp])
             state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_DPAD_UP;
         if (keyboardState[Config::Key_DPadDown])
@@ -444,16 +530,19 @@ uint32_t XamInputGetState(uint32_t userIndex, uint32_t flags, XAMINPUT_STATE* st
         if (keyboardState[Config::Key_DPadRight])
             state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_DPAD_RIGHT;
 
+        // start/back
         if (keyboardState[Config::Key_Start])
             state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_START;
         if (keyboardState[Config::Key_Back])
             state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_BACK;
 
+        // LB/RB
         if (keyboardState[Config::Key_LeftBumper])
             state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_LEFT_SHOULDER;
         if (keyboardState[Config::Key_RightBumper])
             state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_RIGHT_SHOULDER;
 
+        // ABXY
         if (keyboardState[Config::Key_A])
             state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_A;
         if (keyboardState[Config::Key_B])
@@ -462,6 +551,61 @@ uint32_t XamInputGetState(uint32_t userIndex, uint32_t flags, XAMINPUT_STATE* st
             state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_X;
         if (keyboardState[Config::Key_Y])
             state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_Y;
+        // additional buttons just mapped to whatever they are in the pc version
+        // R reload
+        if (keyboardState[Config::Key_Reload])
+            state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_B;
+        
+        // C look back
+        if (keyboardState[Config::Key_LookBehind])
+            state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_RIGHT_THUMB;
+        
+        // h horn
+        if (keyboardState[Config::Key_Horn])
+            state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_LEFT_THUMB;
+        
+        // g headlight
+        if (keyboardState[Config::Key_Headlight])
+            state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_X;
+        
+        // Left/Right radio
+        if (keyboardState[Config::Key_RadioNext])
+            state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_DPAD_RIGHT;
+        if (keyboardState[Config::Key_RadioPrev])
+            state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_DPAD_LEFT;
+        
+        // Mouse
+        if (hid::g_inputDevice == hid::EInputDevice::Mouse || MouseCamera::IsActive())
+        {
+            if (mouseState & SDL_BUTTON_LMASK)
+                state->Gamepad.bRightTrigger = 0xFF;
+            if (mouseState & SDL_BUTTON_RMASK)
+                state->Gamepad.bLeftTrigger = 0xFF;
+            if (mouseState & SDL_BUTTON_MMASK)
+                state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_Y;
+            if (mouseState & SDL_BUTTON_X1MASK)
+                state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_LEFT_SHOULDER;
+            if (mouseState & SDL_BUTTON_X2MASK)
+                state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_RIGHT_SHOULDER;
+            int32_t wheelDelta = hid::GetMouseWheelDelta();
+            if (wheelDelta > 0)
+            {
+                state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_DPAD_RIGHT;
+                hid::ResetMouseWheelDelta();
+            }
+            else if (wheelDelta < 0)
+            {
+                state->Gamepad.wButtons |= XAMINPUT_GAMEPAD_DPAD_LEFT;
+                hid::ResetMouseWheelDelta();
+            }
+            int16_t mouseX, mouseY;
+            MouseCamera::GetAnalogValues(mouseX, mouseY);
+            if (MouseCamera::IsActive())
+            {
+                state->Gamepad.sThumbRX = mouseX;
+                state->Gamepad.sThumbRY = mouseY;
+            }
+        }
     }
 
     state->Gamepad.wButtons &= ~hid::g_prohibitedButtons;
@@ -489,11 +633,72 @@ uint32_t XamInputGetState(uint32_t userIndex, uint32_t flags, XAMINPUT_STATE* st
 
 uint32_t XamInputSetState(uint32_t userIndex, uint32_t flags, XAMINPUT_VIBRATION* vibration)
 {
-    if (!hid::IsInputDeviceController() || !Config::Vibration)
+    if (userIndex != 0)
+        return ERROR_NO_SUCH_USER;
+
+    if (!hid::IsInputDeviceController())
         return ERROR_SUCCESS;
 
     ByteSwapInplace(vibration->wLeftMotorSpeed);
     ByteSwapInplace(vibration->wRightMotorSpeed);
 
     return hid::SetState(userIndex, vibration);
+}
+
+// profile Settings Stubs
+uint32_t XamUserReadProfileSettings(uint32_t dwTitleId, uint32_t dwUserIndex, uint32_t dwNumSettingIds,
+    const uint32_t* pdwSettingIds, be<uint32_t>* pcbResults, void* pResults, XXOVERLAPPED* pOverlapped)
+{
+#if SAVE_SYSTEM_DEBUG_LOGGING
+    printf("[XamUserReadProfileSettings] TitleId: 0x%X, User: %u, NumSettings: %u\n",
+           dwTitleId, dwUserIndex, dwNumSettingIds);
+#endif
+// havent done ts yet
+    if (pcbResults)
+        *pcbResults = 0;
+    
+    if (pOverlapped)
+    {
+        pOverlapped->dwCompletionContext = GuestThread::GetCurrentThreadId();
+        pOverlapped->Error = 0;
+        pOverlapped->Length = 0;
+    }
+    
+    return ERROR_SUCCESS;
+}
+
+uint32_t XamUserWriteProfileSettings(uint32_t dwUserIndex, uint32_t dwNumSettings,
+    const void* pSettings, XXOVERLAPPED* pOverlapped)
+{
+#if SAVE_SYSTEM_DEBUG_LOGGING
+    printf("[XamUserWriteProfileSettings] User: %u, NumSettings: %u\n",
+           dwUserIndex, dwNumSettings);
+#endif
+    // havent done ts yet either
+    if (pOverlapped)
+    {
+        pOverlapped->dwCompletionContext = GuestThread::GetCurrentThreadId();
+        pOverlapped->Error = 0;
+        pOverlapped->Length = 0;
+    }
+    
+    return ERROR_SUCCESS;
+}
+
+// always returns signed in user0
+PPC_FUNC(__imp__XamUserGetSigninState)
+{
+    uint32_t dwUserIndex = ctx.r3.u32;
+    
+    if (dwUserIndex != 0)
+        ctx.r3.u32 = 0;
+    else
+        ctx.r3.u32 = 1; //signed in and logged into xbl
+}
+
+uint32_t XamUserGetSigninInfo(uint32_t dwUserIndex, uint32_t dwFlags, void* pInfo)
+{
+    if (dwUserIndex != 0)
+        return ERROR_NO_SUCH_USER;
+    return ERROR_SUCCESS;
 }

@@ -13,8 +13,10 @@
 #define TRUE                       0x00000001
 #define STATUS_SUCCESS             0x00000000
 #define STATUS_WAIT_0              0x00000000
-#define STATUS_USER_APC            0x000000C0 
+#define STATUS_USER_APC            0x000000C0
 #define STATUS_TIMEOUT             0x00000102
+#define STATUS_NOT_IMPLEMENTED     0xC0000002
+#define STATUS_SEMAPHORE_LIMIT_EXCEEDED             0xC0000047
 #define STATUS_FAIL_CHECK          0xC0000229
 #define INFINITE                   0xFFFFFFFF
 #define FILE_ATTRIBUTE_DIRECTORY   0x00000010  
@@ -36,10 +38,71 @@
 #define ERROR_NO_MORE_FILES        0x12
 #define ERROR_NO_SUCH_USER         0x525
 #define ERROR_SUCCESS              0x0
+#define ERROR_FILE_NOT_FOUND       0x2
 #define ERROR_PATH_NOT_FOUND       0x3
+#define ERROR_ACCESS_DENIED        0x5
+#define ERROR_INVALID_HANDLE       0x6
+#define ERROR_INVALID_PARAMETER    0x57
+#define ERROR_INVALID_NAME         0x7B
+#define ERROR_HANDLE_EOF           0x26
+#define ERROR_ALREADY_EXISTS       0xB7
+#define ERROR_FILE_EXISTS          0x50
+#define ERROR_CALL_NOT_IMPLEMENTED 0x78
 #define ERROR_BAD_ARGUMENTS        0xA0
+#define ERROR_TOO_MANY_POSTS       0x12A
 #define ERROR_DEVICE_NOT_CONNECTED 0x48F
+#define ERROR_EMPTY                0x0
 #define PAGE_READWRITE             0x04
+
+// XINPUT_KEYSTROKE flags
+#define XINPUT_KEYSTROKE_KEYDOWN   0x0001
+#define XINPUT_KEYSTROKE_KEYUP     0x0002
+#define XINPUT_KEYSTROKE_REPEAT    0x0004
+
+// Xbox 360 Virtual Key codes for gamepad
+#define VK_PAD_A                   0x5800
+#define VK_PAD_B                   0x5801
+#define VK_PAD_X                   0x5802
+#define VK_PAD_Y                   0x5803
+#define VK_PAD_RSHOULDER           0x5804
+#define VK_PAD_LSHOULDER           0x5805
+#define VK_PAD_LTRIGGER            0x5806
+#define VK_PAD_RTRIGGER            0x5807
+#define VK_PAD_DPAD_UP             0x5810
+#define VK_PAD_DPAD_DOWN           0x5811
+#define VK_PAD_DPAD_LEFT           0x5812
+#define VK_PAD_DPAD_RIGHT          0x5813
+#define VK_PAD_START               0x5814
+#define VK_PAD_BACK                0x5815
+#define VK_PAD_LTHUMB_PRESS        0x5816
+#define VK_PAD_RTHUMB_PRESS        0x5817
+
+// Standard keyboard virtual keys (Windows VK codes)
+#define VK_BACK                    0x08
+#define VK_TAB                     0x09
+#define VK_RETURN                  0x0D
+#define VK_SHIFT                   0x10
+#define VK_CONTROL                 0x11
+#define VK_ESCAPE                  0x1B
+#define VK_SPACE                   0x20
+#define VK_LEFT                    0x25
+#define VK_UP                      0x26
+#define VK_RIGHT                   0x27
+#define VK_DOWN                    0x28
+#define VK_DELETE                  0x2E
+
+// XINPUT_KEYSTROKE structure (8 bytes, big-endian for Xbox 360)
+typedef struct _XINPUT_KEYSTROKE {
+    be<uint16_t> VirtualKey;
+    be<uint16_t> Unicode;
+    be<uint16_t> Flags;
+    uint8_t UserIndex;
+    uint8_t HidCode;
+} XINPUT_KEYSTROKE;
+
+static_assert(sizeof(XINPUT_KEYSTROKE) == 8);
+
+
 
 typedef union _LARGE_INTEGER {
     struct {
