@@ -29,4 +29,11 @@ The hashes for the game taken from the xbox 360 game disc
 ## install/installer
 Removed DLC checks and parsing. Changed checkfiles to GTA4
 
+## kernel/io/file_system.cpp
+Redirect shader paths to the extracted shaders location created by installer.cpp
 
+## kernel/heap.cpp
+Changed heap allocation sizes
+
+## kernel/memory.cpp/h
+reworked because GTA4 can reach very very low memory.
