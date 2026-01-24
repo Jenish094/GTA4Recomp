@@ -23,4 +23,7 @@ TODO: add weapon wheel functionality with scroll wheel
 ## hid/driver/sdl_hid.cpp
 Not much, just added some translations from SDL scancode unicode to Xbox vkey
 
+## install/hashes
+The hashes for the game taken from the xbox 360 game disc
 
+## install/
