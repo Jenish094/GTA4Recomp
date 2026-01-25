@@ -55,3 +55,16 @@ Added menu language for english
 
 ## locale/locale.h/cpp
 Added menu language for Japanese, English, Spanish, Italian, German and French. These dont work, only english does as of now.
+
+## patches/audio_patches.cpp
+Updated the patch for the GTA4 audio engine
+
+## gta4_aspect_ratio_patches.cpp
+added patches for different aspect ratio monitors. If its bigger than 16:9, it adds pillarboxes and if its lower than 16:9 then add letterboxes
+
+## gta4_input_patches.cpp/h
+Added the register for the xbox controller
+
+## gta4_patches.cpp/h
+No functionality as of now, just a structure which I will add to in debugging
+
