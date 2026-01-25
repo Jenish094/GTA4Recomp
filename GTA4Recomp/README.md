@@ -68,3 +68,24 @@ Added the register for the xbox controller
 ## gta4_patches.cpp/h
 No functionality as of now, just a structure which I will add to in debugging
 
+## res/win32
+changed labels for unleashed recomp to GTA4Recomp
+
+## ui/button_window.cpp
+removed the sonic style button window, handle it differently
+
+## ui/common_menu.cpp
+Changed menu, not too much but it's just the functionality that changed
+
+## ui/game_window
+Added native resolution detection
+
+## ui/options_menu
+Updated options menu to gta4
+
+## user/config
+setup config, based on MarathonRecomp
+
+## user/config_def.h
+config definitions
+

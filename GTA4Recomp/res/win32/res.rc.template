@@ -1,0 +1,40 @@
+#include <windows.h>
+
+#define FERNANDO_RECOMP_VERSION_BIN @WIN32_VERSION_BINARY@
+#define FERNANDO_RECOMP_VERSION_STR "@WIN32_VERSION_STRING@"
+
+#ifdef _DEBUG
+#define FERNANDO_RECOMP_FILE_FLAGS VS_FF_DEBUG
+#else
+#define FERNANDO_RECOMP_FILE_FLAGS 0
+#endif
+
+IDI_ICON1 ICON "@WIN32_ICON_PATH@"
+
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION    FERNANDO_RECOMP_VERSION_BIN
+    PRODUCTVERSION FERNANDO_RECOMP_VERSION_BIN
+    FILEFLAGSMASK  VS_FFI_FILEFLAGSMASK
+    FILEFLAGS      FERNANDO_RECOMP_FILE_FLAGS
+    FILEOS         VOS_NT_WINDOWS32
+    FILETYPE       VFT_APP
+    FILESUBTYPE    VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080904B0" // English (UK), Unicode
+        BEGIN
+            VALUE "ProductName",      "GTA4Recomp"
+            VALUE "FileDescription",  "GTA4Recomp - Jenish094"
+            VALUE "CompanyName",      "hedge-dev"
+            VALUE "FileVersion",      FERNANDO_RECOMP_VERSION_STR
+            VALUE "ProductVersion",   FERNANDO_RECOMP_VERSION_STR
+            VALUE "InternalName",     "UnleashedRecomp"
+            VALUE "OriginalFilename", "SWA.exe"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0809, 0x04B0
+    END
+END
