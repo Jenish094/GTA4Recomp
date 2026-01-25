@@ -1,0 +1,48 @@
+[submodule "thirdparty/concurrentqueue"]
+	path = thirdparty/concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue
+[submodule "thirdparty/imgui"]
+	path = thirdparty/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "thirdparty/ddsspp"]
+	path = thirdparty/ddsspp
+	url = https://github.com/redorav/ddspp
+[submodule "thirdparty/implot"]
+	path = thirdparty/implot
+	url = https://github.com/epezent/implot
+[submodule "thirdparty/json"]
+	path = thirdparty/json
+	url = https://github.com/nlohmann/json
+[submodule "thirdparty/magic_enum"]
+	path = thirdparty/magic_enum
+	url = https://github.com/Neargye/magic_enum
+[submodule "thirdparty/msdf-atlas-gen"]
+	path = thirdparty/msdf-atlas-gen
+	url = https://github.com/Chlumsky/msdf-atlas-gen
+[submodule "thirdparty/nativefiledialog-extended"]
+	path = thirdparty/nativefiledialog-extended
+	url = https://github.com/btzy/nativefiledialog-extended
+[submodule "thirdparty/plume"]
+	path = thirdparty/plume
+	url = https://github.com/renderbag/plume
+[submodule "thirdparty/o1heap"]
+	path = thirdparty/o1heap
+	url = https://github.com/pavel-kirienko/o1heap
+[submodule "thirdparty/stb"]
+	path = thirdparty/stb
+	url = https://github.com/nothings/stb
+[submodule "thirdparty/unordered_dense"]
+	path = thirdparty/unordered_dense
+	url = https://github.com/martinus/unordered_dense
+[submodule "thirdparty/vcpkg"]
+	path = thirdparty/vcpkg
+	url = https://github.com/microsoft/vcpkg
+[submodule "thirdparty/SDL"]
+	path = thirdparty/SDL
+	url = https://github.com/libsdl-org/SDL
+[submodule "thirdparty/SDL_mixer"]
+	path = thirdparty/SDL_mixer
+	url = https://github.com/libsdl-org/SDL_mixer
+[submodule "thirdparty/MoltenVK"]
+	path = thirdparty/MoltenVK
+	url = https://github.com/KhronosGroup/MoltenVK
