@@ -50,3 +50,8 @@ Replace sub_82120000 before game load
 ## kernel/xenon_memory
 init xb360 memory regions because the game assumes that they exist
 
+## locale/config_locale.cpp
+Added menu language for english
+
+## locale/locale.h/cpp
+Added menu language for Japanese, English, Spanish, Italian, German and French. These dont work, only english does as of now.
