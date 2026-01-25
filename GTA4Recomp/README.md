@@ -41,5 +41,12 @@ reworked because GTA4 can reach very very low memory.
 ## kernel/vfs.cpp/h
 Added the VFS system to redirect all calls to specific xbox360ied paths to the host so like game:/common.rpf gets redirected to gamefiles\common\
 
-## xam.h/cpp
+## kernel/xam.h/cpp
 Added translations for keyboard to controller mapping.
+
+## kernel/game_init
+Replace sub_82120000 before game load
+
+## kernel/xenon_memory
+init xb360 memory regions because the game assumes that they exist
+
