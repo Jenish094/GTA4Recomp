@@ -46,3 +46,9 @@
 [submodule "thirdparty/MoltenVK"]
 	path = thirdparty/MoltenVK
 	url = https://github.com/KhronosGroup/MoltenVK
+[submodule "tools/XenonRecomp"]
+	path = tools/XenonRecomp
+	url = https://github.com/sonicnext-dev/XenonRecomp
+[submodule "tools/XenosRecomp"]
+	path = tools/XenosRecomp
+	url = https://github.com/sonicnext-dev/XenosRecomp
