@@ -9,3 +9,12 @@ As goes for most of the files and other projects, the GTA4Recomp folder will hav
 My sources are in docs/SOURCE.md which probably isnt updated yet but I have a list of all my sources on an unsaved notepad file and I will add all of them before the end of this project.
 
 The code is referenced primarily as Fernando_Recomp as i don't want any of the code to be called gta4 so i dont risk a DMCA
+
+pre-extracted rpf files are required in the form of 
+
+common.rpf -> common/
+xbox360.rpf -> xbox360/
+audio.rpf -> audio/
+default.xex
+
+The Xbox 360 folder that may already be in the ISO is NOT required and WILL conflict with the game. only add these 3 folders and xex file into GTA4RecompLib/private
