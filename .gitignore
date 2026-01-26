@@ -6,6 +6,7 @@ game/
 game
 
 .vscode
+.vscode/settings.json
 output.txt
 
 # VS files
