@@ -45,7 +45,6 @@ add_subdirectory("${FERNANDO_RECOMP_THIRDPARTY_ROOT}/o1heap")
 add_subdirectory("${FERNANDO_RECOMP_THIRDPARTY_ROOT}/SDL")
 add_subdirectory("${FERNANDO_RECOMP_THIRDPARTY_ROOT}/SDL_mixer")
 add_subdirectory("${FERNANDO_RECOMP_THIRDPARTY_ROOT}/plume")
-add_subdirectory("${FERNANDO_RECOMP_THIRDPARTY_ROOT}/ffmpeg-core")
 
 if (APPLE)
     add_subdirectory("${FERNANDO_RECOMP_THIRDPARTY_ROOT}/MoltenVK")
