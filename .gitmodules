@@ -46,3 +46,9 @@
 [submodule "tools/XenosRecomp"]
 	path = tools/XenosRecomp
 	url = https://github.com/sonicnext-dev/XenosRecomp
+[submodule "thirdparty/MoltenVK/MoltenVK"]
+	path = thirdparty/MoltenVK/MoltenVK
+	url = https://github.com/KhronosGroup/MoltenVK
+[submodule "thirdparty/MoltenVK/SPIRV-Cross"]
+	path = thirdparty/MoltenVK/SPIRV-Cross
+	url = https://github.com/KhronosGroup/SPIRV-Cross
