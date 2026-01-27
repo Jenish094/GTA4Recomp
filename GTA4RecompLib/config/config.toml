@@ -4,7 +4,7 @@
 [main]
 file_path = "../private/default.xex"
 out_directory_path = "../ppc"
-switch_table_file_path = "GTA4_switch_tables.toml
+switch_table_file_path = "./GTA4_switch_tables.toml
 
 # Optimisations, everything disabled for now
 skip_lr = false

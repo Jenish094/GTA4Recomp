@@ -20,7 +20,7 @@ public:
 
     static std::filesystem::path GetDataPath(bool checkForMods)
     {
-        return GetSavePath(checkForMods) / ACH_FILENAME;
+        return GetUserPath() / ACH_FILENAME;
     }
 
     static time_t GetTimestamp(uint16_t id);

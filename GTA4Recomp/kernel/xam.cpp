@@ -333,10 +333,8 @@ uint32_t XamContentCreateEx(uint32_t dwUserIndex, const char* szRootName, const 
 
             if (pContentData->dwContentType == XCONTENTTYPE_SAVEDATA)
             {
-                rootPath = GetSavePath(true);
-#if SAVE_SYSTEM_DEBUG_LOGGING
-                printf("[XamContentCreateEx] Save data path: %s\n", rootPath.string().c_str());
-#endif
+                // Save data support removed
+                return ERROR_INVALID_PARAMETER;
             }
             else if (pContentData->dwContentType == XCONTENTTYPE_DLC)
             {

@@ -11,7 +11,7 @@ else()
 endif()
 
 target_compile_definitions(XenonRecomp PRIVATE 
-    XENON_RECOMP_CONFIG_FILE_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/config/GTA4.toml\"
+    XENON_RECOMP_CONFIG_FILE_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/config/config.toml\"
     XENON_RECOMP_HEADER_FILE_PATH=\"${FERNANDO_RECOMP_TOOLS_ROOT}/XenonRecomp/XenonUtils/ppc_context.h\")
 
 set(FERNANDO_RECOMP_PPC_RECOMPILED_SOURCES

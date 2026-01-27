@@ -169,7 +169,7 @@ PPC_FUNC(sub_825126A0)
 
         case Sonicteam::TitleTask::TitleState_Proceed:
         {
-            g_saveDataExists = std::filesystem::exists(GetSaveFilePath(false));
+            g_saveDataExists = false; // Save data support removed
 
             // Redirect PRESS START proceed to options open.
             if (g_saveDataExists)

@@ -91,27 +91,6 @@ void KiSystemStartup()
 
     XamRegisterContent(gameContent, gamePath);
 
-    const auto saveFilePath = GetSaveFilePath(true);
-    bool saveFileExists = std::filesystem::exists(saveFilePath);
-
-    if (!saveFileExists)
-    {
-        std::error_code ec;
-        std::filesystem::create_directories(saveFilePath.parent_path(), ec);
-
-        if (!ec)
-        {
-            std::filesystem::copy_file(GetSaveFilePath(false), saveFilePath, ec);
-            saveFileExists = !ec;
-        }
-    }
-
-    if (saveFileExists)
-    {
-        std::u8string savePathU8 = saveFilePath.parent_path().u8string();
-        XamRegisterContent(XamMakeContent(XCONTENTTYPE_SAVEDATA, "GTA4SaveData.bin"), (const char*)(savePathU8.c_str()));
-    }
-
     XamContentCreateEx(0, "game", &gameContent, OPEN_EXISTING, nullptr, nullptr, 0, 0, nullptr);
     XamContentCreateEx(0, "D", &gameContent, OPEN_EXISTING, nullptr, nullptr, 0, 0, nullptr);
 

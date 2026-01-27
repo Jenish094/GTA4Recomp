@@ -1,10 +1,8 @@
-// include every header in the api folder
-
 #pragma once
 
 #include "RAGE/RAGE.h"
 #include "boost/smart_ptr/make_shared_object.h"
-#include "boost/smart_ptr/shared_ptr.h"
+#include "boost/smart_ptr/shared_prt.h"
 #include "d3dxb.h"
 #include "hk330/hkArray.h"
 #include "hk330/hkReferencedObject.h"

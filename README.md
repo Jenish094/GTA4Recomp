@@ -18,3 +18,6 @@ audio.rpf -> audio/
 default.xex
 
 The Xbox 360 folder that may already be in the ISO is NOT required and WILL conflict with the game. only add these 3 folders and xex file into GTA4RecompLib/private
+
+
+Build not working, failing to build XenonRecomp which causes ppc_config.h to be missing. Path for Xenon/Xenos needs to be updates to tools directory somewhere

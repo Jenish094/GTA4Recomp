@@ -25,24 +25,6 @@ inline std::filesystem::path GetGamePath()
     return GetUserPath();
 }
 
-inline std::filesystem::path GetSavePath(bool checkForMods)
-{
-    if (checkForMods && !ModLoader::s_saveFilePath.empty())
-        return ModLoader::s_saveFilePath.parent_path();
-    else
-        return GetUserPath() / "save";
-}
-
-// Returned file name may not necessarily be
-// equal to SYS-DATA as mods can assign anything.
-inline std::filesystem::path GetSaveFilePath(bool checkForMods)
-{
-    if (checkForMods && !ModLoader::s_saveFilePath.empty())
-        return ModLoader::s_saveFilePath;
-    else
-        return GetSavePath(false) / "GTA4SaveData.bin";
-}
-
 static std::string toLower(std::string str) {
     std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) { return std::tolower(c); });
     return str;

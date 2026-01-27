@@ -54,11 +54,6 @@ CONFIG_DEFINE_LOCALE(ControlTutorial)
     { true,  {"Control Tutorial", "Show control tutorial prompts during gameplay."} }
 };
 
-CONFIG_DEFINE_LOCALE(Autosave)
-{
-    { true,  {"Autosave", "Enable or disable the autosave feature."} }
-};
-
 CONFIG_DEFINE_LOCALE(AchievementNotifications)
 {
     { true,  {"Achievement Notifications", "Show notifications when achievements are unlocked."} }

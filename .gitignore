@@ -51,3 +51,6 @@ ipch/
 *.vsp
 *.vspx
 *.sap
+
+out/
+vcpkg_installed/
