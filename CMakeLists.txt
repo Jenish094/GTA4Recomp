@@ -1,7 +1,11 @@
 cmake_minimum_required (VERSION 3.20)
 
 if(NOT DEFINED ENV{VCPKG_ROOT})
-    message(FATAL_ERROR "VCPKG_ROOT is not defined!")
+    if(EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/vcpkg")
+        set(ENV{VCPKG_ROOT} "${CMAKE_SOURCE_DIR}/thirdparty/vcpkg")
+    else()
+        message(FATAL_ERROR "VCPKG_ROOT is not defined and thirdparty/vcpkg not found!")
+    endif()
 endif()
 
 set(FERNANDO_RECOMP_THIRDPARTY_ROOT ${CMAKE_SOURCE_DIR}/thirdparty)

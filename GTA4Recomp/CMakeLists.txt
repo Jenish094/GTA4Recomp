@@ -78,18 +78,9 @@ set(FERNANDO_RECOMP_KERNEL_CXX_SOURCES
     "kernel/memory.cpp"
     "kernel/xenon_memory.cpp"
     "kernel/xam.cpp"
-    "kernel/save_system.cpp"
-    "kernel/save_hooks.cpp"
     "kernel/vfs.cpp"
-    "kernel/mapped_file.cpp"
     "kernel/io/file_system.cpp"
-    "kernel/io/gta_file_system.cpp"
-    "kernel/io/net_socket.cpp"
-    "kernel/io/net_session.cpp"
-    "kernel/io/p2p_manager.cpp"
-    "kernel/io/signaling_client.cpp"
     "kernel/game_init.cpp"
-    "kernel/sync_table.cpp"
 )
 
 set(FERNANDO_RECOMP_LOCALE_CXX_SOURCES
@@ -148,13 +139,11 @@ set(FERNANDO_RECOMP_HID_CXX_SOURCES
 )
 
 set(FERNANDO_RECOMP_PATCHES_CXX_SOURCES
-    # GTA IV-specific patches (active)
     "patches/gta4_patches.cpp"
     "patches/gta4_aspect_ratio_patches.cpp"
-    "patches/gta4_input_patches.cpp"  # GTA IV input remapping
-    "patches/audio_patches.cpp"       # GTA IV audio system (updated for RAGE)
+    "patches/gta4_input_patches.cpp"
+    "patches/audio_patches.cpp"
     "patches/memcpy_patches.cpp"  # Native memcpy implementation to fix broken recompiled control flow
-    "patches/player_limit_patches.cpp"  # Extended multiplayer - raise player limit from 16 to 32+
     
     # Generic/stub patches needed for compilation
     # "patches/aspect_ratio_patches.cpp"  # Has Sonicteam references - replaced by gta4_aspect_ratio_patches.cpp
@@ -183,23 +172,14 @@ set(FERNANDO_RECOMP_UI_CXX_SOURCES
     "ui/game_window.cpp"
     "ui/imgui_utils.cpp"
     "ui/installer_wizard.cpp"
-    "ui/message_window_stub.cpp"   # Stub - GTA IV version needed
-    "ui/network_status_overlay.cpp"
-    "ui/options_menu_stub.cpp"     # Stub - GTA IV version needed
+    "ui/message_window_stub.cpp"
 )
 
 set(FERNANDO_RECOMP_INSTALL_CXX_SOURCES
     "install/installer.cpp"
     "install/iso_file_system.cpp"
-    "install/iso_extractor.cpp"
-    "install/platform_paths.cpp"
-    "install/rpf_extractor.cpp"
-    "install/shader_converter.cpp"
-    "install/thread_pool.cpp"
     "install/update_checker.cpp"
     "install/xcontent_file_system.cpp"
-    "install/xbox360/stfs_parser.cpp"
-    "install/xbox360/xex_patcher.cpp"
     "install/hashes/game.cpp"
 )
 
@@ -207,7 +187,6 @@ set(FERNANDO_RECOMP_USER_CXX_SOURCES
     "user/achievement_data.cpp"
     "user/achievement_manager.cpp"
     "user/config.cpp"
-    "user/persistent_storage_manager.cpp"  # GTA IV save data handling
     "user/registry.cpp"
     "user/paths.cpp"
 )
@@ -440,7 +419,6 @@ target_link_libraries(GTA4Recomp PRIVATE
     xxHash::xxhash
     CURL::libcurl
     plume
-    GameNetworkingSockets::static
 )
 
 target_link_libraries(GTA4Recomp PRIVATE ffmpeg)
@@ -589,7 +567,6 @@ set(RESOURCES_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/res")
 BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/bc_diff/button_bc_diff.bin" DEST_FILE "${RESOURCES_OUTPUT_PATH}/bc_diff/button_bc_diff.bin" ARRAY_NAME "g_button_bc_diff" COMPRESSION_TYPE "zstd")
 BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/font/im_font_atlas.bin" DEST_FILE "${RESOURCES_OUTPUT_PATH}/font/im_font_atlas.bin" ARRAY_NAME "g_im_font_atlas" COMPRESSION_TYPE "zstd")
 BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/font/im_font_atlas.dds" DEST_FILE "${RESOURCES_OUTPUT_PATH}/font/im_font_atlas.dds" ARRAY_NAME "g_im_font_atlas_texture" COMPRESSION_TYPE "zstd")
-BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/images/achievements_menu/trophy.dds" DEST_FILE "${RESOURCES_OUTPUT_PATH}/images/achievements_menu/trophy.dds" ARRAY_NAME "g_trophy" COMPRESSION_TYPE "zstd")
 BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/images/common/button_window.dds" DEST_FILE "${RESOURCES_OUTPUT_PATH}/images/common/button_window.dds" ARRAY_NAME "g_button_window" COMPRESSION_TYPE "zstd")
 BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/images/common/controller.dds" DEST_FILE "${RESOURCES_OUTPUT_PATH}/images/common/controller.dds" ARRAY_NAME "g_controller" COMPRESSION_TYPE "zstd")
 BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/images/common/GTA4Recomp.dds" DEST_FILE "${RESOURCES_OUTPUT_PATH}/images/common/GTA4Recomp.dds" ARRAY_NAME "g_gta4recomp" COMPRESSION_TYPE "zstd")
@@ -603,7 +580,6 @@ BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/images/common/
 BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/images/common/select_arrow.dds" DEST_FILE "${RESOURCES_OUTPUT_PATH}/images/common/select_arrow.dds" ARRAY_NAME "g_select_arrow" COMPRESSION_TYPE "zstd")
 
 ## Installer ##
-BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/images/installer/gta4_logo.dds" DEST_FILE "${RESOURCES_OUTPUT_PATH}/images/installer/gta4_logo.dds" ARRAY_NAME "g_gta4_logo" COMPRESSION_TYPE "zstd")
 BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/images/installer/install_001.dds" DEST_FILE "${RESOURCES_OUTPUT_PATH}/images/installer/install_001.dds" ARRAY_NAME "g_install_001" COMPRESSION_TYPE "zstd")
 BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/images/installer/install_002.dds" DEST_FILE "${RESOURCES_OUTPUT_PATH}/images/installer/install_002.dds" ARRAY_NAME "g_install_002" COMPRESSION_TYPE "zstd")
 BIN2C(TARGET_OBJ GTA4Recomp SOURCE_FILE "${RESOURCES_SOURCE_PATH}/images/installer/install_003.dds" DEST_FILE "${RESOURCES_OUTPUT_PATH}/images/installer/install_003.dds" ARRAY_NAME "g_install_003" COMPRESSION_TYPE "zstd")

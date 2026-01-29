@@ -54,3 +54,5 @@ ipch/
 
 out/
 vcpkg_installed/
+
+.vs/
